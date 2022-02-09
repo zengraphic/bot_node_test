@@ -4,7 +4,7 @@
   "description": "telegram bot",
   "main": "index.js",
   "engines": {
-    "node": "17.0",
+    "node": "14.15.1",
     "npm": "8.1"
   },
   "scripts": {

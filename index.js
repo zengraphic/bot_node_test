@@ -26,7 +26,7 @@ const getlinks = (url, ctx) => {
       ctx.deleteMessage();
       keyboard = list.map((link) => [
         {
-          text: `${link.type} ${link.description}`,
+          text: `${link.description}`,
           url: link.link,
         },
       ]);

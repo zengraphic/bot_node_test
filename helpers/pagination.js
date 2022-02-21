@@ -14,7 +14,7 @@ class Pagination {
         rowSize = 5,
         currentPage = 1,
         onSelect = () => { },
-        format = (item, index) => `${index + 1}. ${item}`,
+        format = (item, index) => `${index + 1}) ${item}`,
         header = (currentPage, pageSize, total) => `Items ${(currentPage - 1) * pageSize + 1}-${currentPage * pageSize <= total ? currentPage * pageSize : total} of ${total}`,
         messages = this.defaultMessages
     }) {

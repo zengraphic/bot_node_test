@@ -15,7 +15,7 @@ bot.command("link", (ctx) => {
 
 const getlinksCategories = (sheet, ctx) => {
   getData(sheet)
-    .then((response) => {
+    .then(async (response) => {
       const action = [
         {
           text: "chiudi ❌",
@@ -28,7 +28,22 @@ const getlinksCategories = (sheet, ctx) => {
           getlinksCategories(sheet, ctx);
           return;
         }
-        const linkButtons = response.map((link) => [
+        let pagination = new Pagination({
+          data: response,
+          onSelect: (item) => {
+            console.log(item)
+            getlinks(item, ctx);
+          },
+        });
+        let text = await pagination.text();
+        let {reply_markup} = await pagination.keyboard();
+        bot.telegram.sendMessage(ctx.chat.id, text, {
+          parse_mode: "Markdown",
+          reply_markup,
+          disable_notification: true,
+        });
+        pagination.handleActions(bot);
+       /*  const linkButtons = response.map((link) => [
           {
             text: `${link}`,
             callback_data: `${link}`,
@@ -49,7 +64,7 @@ const getlinksCategories = (sheet, ctx) => {
         const callbacks = response.map((link) => link[0]);
         bot.action(callbacks, (ctx) => {
           getlinks(ctx.match[0], ctx);
-        });
+        }); */
       } else {
         ctx.reply("riprova getlinksKeyboard no response");
       }

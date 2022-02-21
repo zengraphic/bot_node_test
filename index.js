@@ -30,6 +30,7 @@ const getlinksCategories = (sheet, ctx) => {
         }
         let pagination = new Pagination({
           data: response,
+          rowSize:1,
           onSelect: (item) => {
             console.log(item)
             getlinks(item, ctx);

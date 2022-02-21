@@ -8,6 +8,7 @@ const { Pagination } = require("./helpers/pagination");
 const { convertToObj, getData } = require("./helpers/helpers");
 
 bot.start((ctx) => ctx.reply("Benvenuto!"));
+
 bot.command("link", (ctx) => {
   getlinksCategories("index", ctx);
 });
@@ -24,7 +25,6 @@ const getlinksCategories = (sheet, ctx) => {
       ctx.deleteMessage();
       if (response && response.length >= 1) {
         if (response[0][0].includes("#")) {
-          ctx.reply("Riprova, c'è stato un errore");
           getlinksCategories(sheet, ctx);
           return;
         }
@@ -66,8 +66,6 @@ const getlinks = (sheet, ctx) => {
       const objKeys = res.shift();
       const respLinks = res;
       const list = convertToObj(objKeys, respLinks);
-      //let keyboard;
-      // ctx.deleteMessage();
       let pagination = new Pagination({
         data: list,
         format: (item, index) => `${index + 1}) ${item.name}`,
@@ -80,15 +78,14 @@ const getlinks = (sheet, ctx) => {
             },
           ];
           if (selected) {
-            let message = `
-*Nome:* ${selected.name}
-*descrizione:* ${selected.description}
-*tipo:* ${selected.type}
-*referrer:* ${selected.link}
-*a pagamento:* ${selected.saleable}
-            `;
+            let message = '';
+            selected.name ? message += `<b>Nome:</b> ${selected.name}\n` : message ;
+            selected.description ? message += `<b>Descrizione:</b> ${selected.description}\n` : message ;
+            selected.type ? message += `<b>Tipo:</b> ${selected.type}\n` : message ;
+            selected.link ? message += `<b>Referrer:</b> ${selected.link}\n` : message ;
+            selected.saleable ? message += `<b>Referrer:</b> ${selected.saleable}\n` : message ;
             bot.telegram.sendMessage(ctx.chat.id, message, {
-              parse_mode: "Markdown",
+              parse_mode: "HTML",
               reply_markup: {
                 inline_keyboard: [action],
               },
@@ -104,7 +101,6 @@ const getlinks = (sheet, ctx) => {
         reply_markup,
         disable_notification: true,
       });
-      //ctx.reply(text, keyboard);
       pagination.handleActions(bot);
     })
     .catch((err) => {

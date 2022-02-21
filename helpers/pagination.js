@@ -77,7 +77,7 @@ class Pagination {
         // Pagination Controls
         this.totalPages > 1 && this.currentPage > 1 ? row.push(getButton(this.messages.prev, `${this._callbackStr}-prev`)) : null ;
         row.push(getButton(this.messages.delete, `close`));
-        this.totalPages > 1 ? row.push(getButton(this.messages.next, `${this._callbackStr}-next`)) : null;
+        this.totalPages > 1 && this.currentPage < this.totalPages ? row.push(getButton(this.messages.next, `${this._callbackStr}-next`)) : null;
         keyboard.push(row);
         // Give ready-to-use Telegra Markup object
         return {

@@ -26,10 +26,9 @@ class Pagination {
         this.format = format;
         this.header = header;
         this.messages = messages
-        this.total = this.lazy ? (total ?? Infinity) : this.data.length;
+        this.total = this.data.length;
         this.totalPages = Math.ceil(this.total / this.pageSize);
-        this.currentPage = (currentPage && (this.lazy || currentPage < this.totalPages))
-            ? currentPage : 1;
+        this.currentPage = (currentPage && (currentPage < this.totalPages)) ? currentPage : 1;
         this.format = format;
         this.header = header;
         this.onSelect = onSelect;

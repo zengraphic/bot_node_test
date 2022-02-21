@@ -70,8 +70,8 @@ const getlinks = (sheet, ctx) => {
       // ctx.deleteMessage();
       let pagination = new Pagination({
         data: list,
-        format: (item, index) => `${index + 1}. ${item.name}`,
-        onSelect: (item, index) => {
+        format: (item, index) => `${index + 1}) ${item.name}`,
+        onSelect: (item) => {
           const selected = list.find((resLink) => resLink.id === item.id);
           const action = [
             {
@@ -81,11 +81,11 @@ const getlinks = (sheet, ctx) => {
           ];
           if (selected) {
             let message = `
-Nome: ${selected.name}
-descrizione: ${selected.description}
-tipo: ${selected.type}
-referrer: ${selected.link}
-a pagamento: ${selected.saleable}
+*Nome:* ${selected.name}
+*descrizione:* ${selected.description}
+*tipo:* ${selected.type}
+*referrer:* ${selected.link}
+*a pagamento:* ${selected.saleable}
             `;
             bot.telegram.sendMessage(ctx.chat.id, message, {
               parse_mode: "Markdown",
@@ -98,9 +98,13 @@ a pagamento: ${selected.saleable}
         },
       });
       let text = await pagination.text();
-      let keyboard = await pagination.keyboard();
-      ctx.reply(text, keyboard);
-
+      let {reply_markup} = await pagination.keyboard();
+      bot.telegram.sendMessage(ctx.chat.id, text, {
+        parse_mode: "Markdown",
+        reply_markup,
+        disable_notification: true,
+      });
+      //ctx.reply(text, keyboard);
       pagination.handleActions(bot);
     })
     .catch((err) => {

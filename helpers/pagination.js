@@ -9,7 +9,6 @@ class Pagination {
 
     constructor({
         data = [],
-        lazy = false,
         total,
         pageSize = 10,
         rowSize = 5,
@@ -19,15 +18,7 @@ class Pagination {
         header = (currentPage, pageSize, total) => `Items ${(currentPage - 1) * pageSize + 1}-${currentPage * pageSize <= total ? currentPage * pageSize : total} of ${total}`,
         messages = this.defaultMessages
     }) {
-        this.lazy = lazy;
-        if (!this.lazy && Array.isArray(data)) {
-            this.data = data;
-        }
-        else if (this.lazy && typeof data === "function") {
-            this.data = data;
-        } else {
-            throw new TypeError(`data must be function or array depending on value of lazy`);
-        }
+        this.data = data;
         this.pageSize = pageSize;
         this.rowSize = rowSize;
         this.currentPage = currentPage;
@@ -50,11 +41,7 @@ class Pagination {
     }
 
     async text() {
-        if (this.lazy) {
-            this.currentItems = await this.data(this.currentPage, this.pageSize);
-        } else {
-            this.currentItems = getPageData(this.data, this.currentPage, this.pageSize);
-        }
+        this.currentItems = getPageData(this.data, this.currentPage, this.pageSize);
         const items = this.currentItems;
 
         const header = this.header(this.currentPage, this.pageSize, this.total);
@@ -66,11 +53,7 @@ class Pagination {
     async keyboard() {
         const keyboard = [];
 
-        if (this.lazy) {
-            this.currentItems = await this.data(this.currentPage, this.pageSize);
-        } else {
-            this.currentItems = getPageData(this.data, this.currentPage, this.pageSize);
-        }
+        this.currentItems = getPageData(this.data, this.currentPage, this.pageSize);
         const items = this.currentItems;
 
         let row = [];
@@ -93,9 +76,9 @@ class Pagination {
         row = [];
 
         // Pagination Controls
-        row.push(getButton(this.messages.prev, `${this._callbackStr}-prev`));
-        row.push(getButton(this.messages.delete, `${this._callbackStr}-delete`));
-        row.push(getButton(this.messages.next, `${this._callbackStr}-next`));
+        this.totalPages > 1 && this.currentPage > 1 ? row.push(getButton(this.messages.prev, `${this._callbackStr}-prev`)) : null ;
+        row.push(getButton(this.messages.delete, `close`));
+        this.totalPages > 1 ? row.push(getButton(this.messages.next, `${this._callbackStr}-next`)) : null;
         keyboard.push(row);
         // Give ready-to-use Telegra Markup object
         return {

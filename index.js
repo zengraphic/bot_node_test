@@ -91,10 +91,10 @@ const getlinks = (sheet, ctx) => {
               ? (message += `<b>Tipo:</b> ${selected.type}\n`)
               : message;
             selected.link
-              ? (message += `<b>Referrer:</b> ${selected.link}\n`)
+              ? (message += `<b>link/riferimento:</b> ${selected.link}\n`)
               : message;
             selected.saleable
-              ? (message += `<b>A pagamento:</b> ${selected.saleable}\n`)
+              ? (message += `<b>A pagamento/retribuito:</b> ${selected.saleable}\n`)
               : message;
             bot.telegram.sendMessage(userID, message, {
               parse_mode: "HTML",

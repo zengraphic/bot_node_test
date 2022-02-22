@@ -46,7 +46,7 @@ class Pagination {
         const header = this.header(this.currentPage, this.pageSize, this.total);
         const itemsText = items.map(this.format).join('\n');
 
-        return `${header}\n${itemsText}`;
+        return `${header}\n${itemsText.toUpperCase()}`;
     }
 
     async keyboard() {
@@ -100,7 +100,8 @@ class Pagination {
                     keyboard = await this.keyboard();
                     await ctx.editMessageText(text, {
                         ...keyboard,
-                        parse_mode: 'HTML'
+                        parse_mode: 'HTML',
+                        disable_notification: true
                     });
                     break;
                 case 'next':
@@ -112,7 +113,8 @@ class Pagination {
                     keyboard = await this.keyboard();
                     await ctx.editMessageText(text, {
                         ...keyboard,
-                        parse_mode: 'HTML'
+                        parse_mode: 'HTML',
+                        disable_notification: true
                     });
                     break;
                 case 'delete':

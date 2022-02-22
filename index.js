@@ -91,7 +91,9 @@ const getlinks = (sheet, ctx) => {
               ? (message += `<b>Tipo:</b> ${selected.type}\n`)
               : message;
             selected.link
-              ? (message += `<b>link/riferimento:</b> ${selected.link}\n`)
+              ? selected.link.includes("https")
+                ? (message += `<b>link/riferimento:</b> ${selected.link}\n`)
+                : (message += `<b>link/riferimento:</b> https://t.me/${selected.link}\n`)
               : message;
             selected.saleable
               ? (message += `<b>A pagamento/retribuito:</b> ${selected.saleable}\n`)

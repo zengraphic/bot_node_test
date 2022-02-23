@@ -35,17 +35,17 @@ const getlinks = (sheet, ctx) => {
   getData(sheet)
     .then(async (res) => {
       if (sheet === "index") {
-        paginationOptions = {
-          data: res,
-          rowSize: 1,
-          onSelect: (item) => {
-            getlinks(item, ctx);
-          },
-        }
         if (res && res.length >= 1) {
           if (res[0][0].includes("#")) {
             getlinksCategories(sheet, ctx);
             return;
+          }
+          paginationOptions = {
+            data: res,
+            rowSize: 1,
+            onSelect: (item) => {
+              getlinks(item, ctx);
+            },
           }
           pagination = new Pagination(paginationOptions);
         }

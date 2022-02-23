@@ -27,75 +27,87 @@ bot.command("link", (ctx) => {
   getlinksCategories("index", ctx);
 });
 
+const getlinksCategories = (sheet, ctx) => {
+  const userID = ctx.from.id;
+  getData(sheet)
+    .then(async (response) => {
+      ctx.deleteMessage();
+      if (response && response.length >= 1) {
+        if (response[0][0].includes("#")) {
+          getlinksCategories(sheet, ctx);
+          return;
+        }
+        let pagination = new Pagination({
+          data: response,
+          rowSize: 1,
+          onSelect: (item) => {
+            getlinks(item, ctx);
+          },
+        });
+        let text = await pagination.text();
+        let { reply_markup } = await pagination.keyboard();
+        bot.telegram.sendMessage(userID, text, {
+          parse_mode: "Markdown",
+          reply_markup,
+        });
+        pagination.handleActions(bot);
+      } else {
+        ctx.reply("riprova getlinksKeyboard no response");
+      }
+    })
+    .catch((err) => {
+      console.log(err);
+      ctx.reply("riprova getlinksKeyboard");
+    });
+};
+
 const getlinks = (sheet, ctx) => {
   const userID = ctx.from.id;
-  let paginationOptions;
-  let pagination;
-
   getData(sheet)
     .then(async (res) => {
-      if (sheet === "index") {
-        if (res && res.length >= 1) {
-          if (res[0][0].includes("#")) {
-            getlinksCategories(sheet, ctx);
-            return;
-          }
-          paginationOptions = {
-            data: res,
-            rowSize: 1,
-            onSelect: (item) => {
-              getlinks(item, ctx);
+      const objKeys = res.shift();
+      const respLinks = res;
+      const list = convertToObj(objKeys, respLinks);
+      let pagination = new Pagination({
+        data: list,
+        format: (item, index) => `${index + 1}) ${item.name}`,
+        onSelect: (item) => {
+          const selected = list.find((resLink) => resLink.id === item.id);
+          const action = [
+            {
+              text: "chiudi ❌",
+              callback_data: "close",
             },
-          }
-          pagination = new Pagination(paginationOptions);
-        }
-      } else {
-        paginationOptions = {
-          data: list,
-          format: (item, index) => `${index + 1}) ${item.name}`,
-          onSelect: (item) => {
-            const selected = list.find((resLink) => resLink.id === item.id);
-            const action = [
-              {
-                text: "chiudi ❌",
-                callback_data: "close",
+          ];
+          if (selected) {
+            let message = "";
+            selected.name
+              ? (message += `<b>Nome:</b> ${selected.name}\n`)
+              : message;
+            selected.description
+              ? (message += `<b>Descrizione:</b> ${selected.description}\n`)
+              : message;
+            selected.type
+              ? (message += `<b>Tipo:</b> ${selected.type}\n`)
+              : message;
+            selected.link
+              ? selected.link.includes("https")
+                ? (message += `<b>link/riferimento:</b> ${selected.link}\n`)
+                : (message += `<b>link/riferimento:</b> https://t.me/${selected.link}\n`)
+              : message;
+            selected.saleable
+              ? (message += `<b>A pagamento/retribuito:</b> ${selected.saleable}\n`)
+              : message;
+            bot.telegram.sendMessage(userID, message, {
+              parse_mode: "HTML",
+              reply_markup: {
+                inline_keyboard: [action],
               },
-            ];
-            if (selected) {
-              let message = "";
-              selected.name
-                ? (message += `<b>Nome:</b> ${selected.name}\n`)
-                : message;
-              selected.description
-                ? (message += `<b>Descrizione:</b> ${selected.description}\n`)
-                : message;
-              selected.type
-                ? (message += `<b>Tipo:</b> ${selected.type}\n`)
-                : message;
-              selected.link
-                ? selected.link.includes("https")
-                  ? (message += `<b>link/riferimento:</b> ${selected.link}\n`)
-                  : (message += `<b>link/riferimento:</b> https://t.me/${selected.link}\n`)
-                : message;
-              selected.saleable
-                ? (message += `<b>A pagamento/retribuito:</b> ${selected.saleable}\n`)
-                : message;
-              bot.telegram.sendMessage(userID, message, {
-                parse_mode: "HTML",
-                reply_markup: {
-                  inline_keyboard: [action],
-                },
-                disable_notification: true,
-              });
-            }
-          },
-        }
-        const objKeys = res.shift();
-        const respLinks = res;
-        const list = convertToObj(objKeys, respLinks);
-        pagination = new Pagination(paginationOptions);
-      }
-
+              disable_notification: true,
+            });
+          }
+        },
+      });
       let text = await pagination.text();
       let { reply_markup } = await pagination.keyboard();
       bot.telegram.sendMessage(userID, text, {
@@ -133,7 +145,7 @@ const sayHello = (ctx) => {
 
 bot.action("close", (ctx) => ctx.deleteMessage());
 bot.action("link", (ctx) => {
-  getlinks("index", ctx);
+  getlinksCategories("index", ctx);
 });
 
 bot.launch();
